@@ -1,12 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import dynamic from "next/dynamic";
-import { wrap } from "framer-motion";
-
-
-const Calendar = dynamic(() => import("react-calendar"), {
-  ssr: false,
-});
+import Calendar from "react-calendar";
+import "react-calendar/dist/Calendar.css";
 
 import { db, auth } from "../../lib/firebase";
 import {
@@ -14,170 +9,90 @@ import {
   getDocs,
   doc,
   setDoc,
-  getDoc,
   deleteDoc,
 } from "firebase/firestore";
-
 import { onAuthStateChanged } from "firebase/auth";
 
 export default function GenerateJadwal() {
   const router = useRouter();
-
   const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
-
   const [jumlah, setJumlah] = useState(3);
   const [selectedDates, setSelectedDates] = useState([]);
 
-  // ================== 🔐 PROTEKSI ADMIN ==================
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
-  if (!user) {
-    router.push("/login");
-    return;
-  }
+      if (!user) return router.push("/login");
 
-  if (user.email !== "ranggaagungfadilah@gmail.com") {
-    alert("Akses ditolak");
-    router.push("/");
-    return;
-  }
+      if (user.email !== "ranggaagungfadilah@gmail.com") {
+        alert("Akses ditolak");
+        return router.push("/");
+      }
 
-
-      setIsAdmin(true);
       setLoading(false);
     });
 
     return () => unsub();
   }, []);
 
-  if (loading) return <p>Loading...</p>;
-  if (!isAdmin) return null;
+  if (loading) return null;
 
-  // ================== 📅 LOGIC KALENDER ==================
-  const formatDate = (date) => {
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, "0");
-    const d = String(date.getDate()).padStart(2, "0");
-    return `${y}-${m}-${d}`;
-  };
+  const format = (d) => d.toISOString().split("T")[0];
 
-  const toggleDate = (date) => {
-    const ymd = formatDate(date);
-    setSelectedDates((prev) =>
-      prev.includes(ymd) ? prev.filter((d) => d !== ymd) : [...prev, ymd]
+  const toggle = (d) => {
+    const t = format(d);
+    setSelectedDates((p) =>
+      p.includes(t) ? p.filter((x) => x !== t) : [...p, t]
     );
   };
 
-  const removeDate = (ymd) => {
-    setSelectedDates((prev) => prev.filter((d) => d !== ymd));
-  };
-
-  const clearAllDates = () => {
-    setSelectedDates([]);
-  };
-
-  // ================== 🚀 GENERATE JADWAL ==================
   const generate = async () => {
-    if (selectedDates.length === 0) {
-      alert("Pilih tanggal masuk dulu!");
-      return;
-    }
-
-    // 🔥 HAPUS JADWAL LAMA
     const old = await getDocs(collection(db, "jadwal_piket"));
-    for (const d of old.docs) {
-      await deleteDoc(doc(db, "jadwal_piket", d.id));
-    }
+    for (const d of old.docs) await deleteDoc(doc(db, "jadwal_piket", d.id));
 
-    // ambil anggota
     const snap = await getDocs(collection(db, "anggota"));
     let anggota = snap.docs.map((d) => d.data().nama);
-    anggota = anggota.sort(() => Math.random() - 0.5);
 
-    const tanggalUrut = [...selectedDates].sort();
+    let i = 0;
 
-    let index = 0;
-    let putaran = 1;
+    for (const t of selectedDates.sort()) {
+      const grup = anggota.slice(i, i + jumlah);
+      i += jumlah;
 
-    for (let tgl of tanggalUrut) {
-      let grup = [];
-
-      for (let i = 0; i < jumlah; i++) {
-        if (anggota[index]) {
-          grup.push(anggota[index]);
-          index++;
-        }
-      }
-
-      if (grup.length === 0) break;
-
-      await setDoc(doc(db, "jadwal_piket", tgl), {
-        tanggal: tgl,
+      await setDoc(doc(db, "jadwal_piket", t), {
+        tanggal: t,
         kelompok: grup,
-        putaran,
-        status: "belum",
+        putaran: 1,
       });
     }
 
-    alert("Jadwal berhasil dibuat ✅");
+    alert("Jadwal jadi");
   };
 
-  // ================== 🎨 UI ==================
   return (
     <div style={wrap}>
       <div style={card}>
-        <h1>🗓️ Generate Jadwal</h1>
-
-        <label>Jumlah orang per kelompok</label>
         <input
           type="number"
           value={jumlah}
-          onChange={(e) => setJumlah(Number(e.target.value))}
-          style={input}
+          onChange={(e) => setJumlah(+e.target.value)}
         />
 
-        <Calendar
-          onClickDay={toggleDate}
-          tileClassName={({ date }) =>
-            selectedDates.includes(formatDate(date)) ? "masuk" : null
-          }
-        />
+        <Calendar onClickDay={toggle} />
 
-        {selectedDates.length > 0 && (
-          <div style={listBox}>
-            <b>Tanggal dipilih:</b>
-            {selectedDates.sort().map((d) => (
-              <div key={d} style={dateItem}>
-                {d}
-                <button onClick={() => removeDate(d)}>✖</button>
-              </div>
-            ))}
-            <button onClick={clearAllDates}>Hapus Semua</button>
-          </div>
-        )}
-
-        <button onClick={generate} style={btn}>
-          🚀 Generate Jadwal
-        </button>
+        <button onClick={generate}>Generate</button>
       </div>
-
-      <style jsx global>{`
-        .masuk {
-          background: #2563eb !important;
-          color: white !important;
-          border-radius: 8px;
-        }
-      `}</style>
     </div>
   );
 }
 
-<style jsx global>{`
-@import url('https://unpkg.com/react-calendar/dist/Calendar.css');
-.masuk {
-  background:#2563eb!important;
-  color:white!important;
-  border-radius:8px;
-}
-`}</style>
+const wrap = {
+  minHeight: "100vh",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+};
+
+const card = {
+  background: "white",
+  padding: 30,
+};

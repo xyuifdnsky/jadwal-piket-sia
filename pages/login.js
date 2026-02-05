@@ -1,93 +1,69 @@
 import { useState } from "react";
+import { useRouter } from "next/router";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../lib/firebase";
-import { useRouter } from "next/router";
-import { wrap } from "framer-motion";
-
 
 export default function Login() {
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-const router = useRouter();
+  const login = async () => {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      router.push("/admin/GenerateJadwal");
+    } catch {
+      alert("Login gagal");
+    }
+  };
 
-const [email,setEmail]=useState("");
-const [password,setPassword]=useState("");
+  return (
+    <div style={wrap}>
+      <div style={card}>
+        <h2>LOGIN ADMIN</h2>
 
-const login = async ()=>{
+        <input
+          placeholder="Email"
+          onChange={(e) => setEmail(e.target.value)}
+          style={input}
+        />
 
-try{
+        <input
+          placeholder="Password"
+          type="password"
+          onChange={(e) => setPassword(e.target.value)}
+          style={input}
+        />
 
-await signInWithEmailAndPassword(auth,email,password);
-
-router.push("/admin/generate_jadwal");
-}catch(err){
-
-alert(err.message);
-
+        <button onClick={login} style={btn}>LOGIN</button>
+      </div>
+    </div>
+  );
 }
 
-}
+const wrap = {
+  minHeight: "100vh",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  background: "#020617",
+};
 
-return(
+const card = {
+  background: "white",
+  padding: 30,
+  borderRadius: 12,
+  width: 300,
+};
 
-<div style={wrapStyle}>
+const input = {
+  width: "100%",
+  marginBottom: 10,
+  padding: 10,
+};
 
-
-<div style={card}>
-
-<h2>🔐 Admin Login</h2>
-
-<input
-placeholder="Email"
-value={email}
-onChange={e=>setEmail(e.target.value)}
-style={input}
-/>
-
-<input
-type="password"
-placeholder="Password"
-value={password}
-onChange={e=>setPassword(e.target.value)}
-style={input}
-/>
-
-<button onClick={login} style={btn}>
-Login
-</button>
-
-</div>
-</div>
-
-)
-}
-
-const wrapStyle = {
-
-minHeight:"100vh",
-display:"flex",
-justifyContent:"center",
-alignItems:"center",
-background:"#0f172a"
-}
-
-const card={
-background:"white",
-padding:30,
-borderRadius:12,
-width:300
-}
-
-const input={
-width:"100%",
-padding:10,
-marginBottom:15
-}
-
-const btn={
-width:"100%",
-padding:10,
-background:"#2563eb",
-color:"white",
-border:"none",
-borderRadius:6
-}
+const btn = {
+  width: "100%",
+  padding: 10,
+};
+ 
