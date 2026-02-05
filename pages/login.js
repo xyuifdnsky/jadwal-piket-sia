@@ -11,20 +11,21 @@ export default function Login() {
   const login = async () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      router.push("/generate_jadwal");
-    } catch {
-      alert("Login gagal");
+      router.push("/admin/generate_jadwal");
+    } catch (err) {
+      console.log(err);
+      alert(err.message);
     }
   };
 
   return (
-  <div style={wrapStyle}>
-
+    <div style={wrapStyle}>
       <div style={card}>
         <h2>LOGIN ADMIN</h2>
 
         <input
           placeholder="Email"
+          value={email}
           onChange={(e) => setEmail(e.target.value)}
           style={input}
         />
@@ -32,6 +33,7 @@ export default function Login() {
         <input
           placeholder="Password"
           type="password"
+          value={password}
           onChange={(e) => setPassword(e.target.value)}
           style={input}
         />
@@ -42,7 +44,7 @@ export default function Login() {
   );
 }
 
-const wrap = {
+const wrapStyle = {
   minHeight: "100vh",
   display: "flex",
   justifyContent: "center",
@@ -55,10 +57,8 @@ const card = {
   borderRadius: 16,
   padding: "16px",
   boxShadow: "0 20px 40px rgba(0,0,0,0.25)",
-  maxWidth: 1100,
-  margin: "auto",
+  width: 320,
 };
-
 
 const input = {
   width: "100%",
@@ -70,4 +70,3 @@ const btn = {
   width: "100%",
   padding: 10,
 };
- 

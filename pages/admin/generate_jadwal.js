@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 
-import { db, auth } from "../lib/firebase";
+import { db, auth } from "../../lib/firebase";
 import {
   collection,
   getDocs,
