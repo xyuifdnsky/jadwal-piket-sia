@@ -11,7 +11,7 @@ export default function Login() {
   const login = async () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      router.push("/admin/generate_jadwal");
+      router.push("/generate_jadwal");
     } catch {
       alert("Login gagal");
     }
