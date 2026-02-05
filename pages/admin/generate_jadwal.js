@@ -25,18 +25,18 @@ export default function GenerateJadwal() {
 
   // ================== 🔐 PROTEKSI ADMIN ==================
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        router.replace("/");
-        return;
-      }
+    const unsub = onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    router.push("/login");
+    return;
+  }
 
-      const snap = await getDoc(doc(db, "users", user.uid));
-      if (!snap.exists() || snap.data().role !== "admin") {
-        alert("Akses ditolak");
-        router.replace("/");
-        return;
-      }
+  if (user.email !== "ranggaagungfadilah@gmail.com") {
+    alert("Akses ditolak");
+    router.push("/");
+    return;
+  }
+
 
       setIsAdmin(true);
       setLoading(false);
