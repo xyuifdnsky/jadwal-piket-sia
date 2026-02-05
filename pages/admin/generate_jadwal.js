@@ -15,17 +15,20 @@ import { onAuthStateChanged } from "firebase/auth";
 
 export default function GenerateJadwal() {
   const router = useRouter();
+
   const [loading, setLoading] = useState(true);
   const [jumlah, setJumlah] = useState(3);
   const [selectedDates, setSelectedDates] = useState([]);
 
+  // 🔐 ADMIN ONLY
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
       if (!user) return router.push("/login");
 
       if (user.email !== "ranggaagungfadilah@gmail.com") {
         alert("Akses ditolak");
-        return router.push("/");
+        router.push("/");
+        return;
       }
 
       setLoading(false);
@@ -34,72 +37,153 @@ export default function GenerateJadwal() {
     return () => unsub();
   }, []);
 
-  if (loading) return null;
+  if (loading) return <p>Loading...</p>;
 
-  const format = (d) => d.toISOString().split("T")[0];
+  const formatDate = (d) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
+      d.getDate()
+    ).padStart(2, "0")}`;
 
-  const toggle = (d) => {
-    const t = format(d);
-    setSelectedDates((p) =>
-      p.includes(t) ? p.filter((x) => x !== t) : [...p, t]
-    );
+  // ➕ TOGGLE DATE (MAX 10)
+  const toggleDate = (date) => {
+    const ymd = formatDate(date);
+
+    setSelectedDates((prev) => {
+      if (prev.includes(ymd)) return prev.filter((d) => d !== ymd);
+
+      if (prev.length >= 10) {
+        alert("Maksimal 10 hari!");
+        return prev;
+      }
+
+      return [...prev, ymd];
+    });
   };
 
+  const removeDate = (d) =>
+    setSelectedDates((prev) => prev.filter((x) => x !== d));
+
+  const clearAll = () => setSelectedDates([]);
+
+  // 🚀 GENERATE
   const generate = async () => {
+    if (!selectedDates.length) return alert("Pilih tanggal!");
+
     const old = await getDocs(collection(db, "jadwal_piket"));
-    for (const d of old.docs) await deleteDoc(doc(db, "jadwal_piket", d.id));
+    for (const d of old.docs)
+      await deleteDoc(doc(db, "jadwal_piket", d.id));
 
     const snap = await getDocs(collection(db, "anggota"));
     let anggota = snap.docs.map((d) => d.data().nama);
+    anggota = anggota.sort(() => Math.random() - 0.5);
 
-    let i = 0;
+    const tanggal = [...selectedDates].sort();
 
-    for (const t of selectedDates.sort()) {
-      const grup = anggota.slice(i, i + jumlah);
-      i += jumlah;
+    let index = 0;
 
-      await setDoc(doc(db, "jadwal_piket", t), {
-        tanggal: t,
+    for (let tgl of tanggal) {
+      let grup = [];
+
+      for (let i = 0; i < jumlah; i++) {
+        if (anggota[index]) grup.push(anggota[index++]);
+      }
+
+      if (!grup.length) break;
+
+      await setDoc(doc(db, "jadwal_piket", tgl), {
+        tanggal: tgl,
         kelompok: grup,
-        putaran: 1,
+        status: "belum",
       });
     }
 
-    alert("Jadwal jadi");
+    alert("Jadwal berhasil dibuat");
   };
 
   return (
-<div style={wrapStyle}>
-
+    <div style={wrap}>
       <div style={card}>
+        <h2>Generate Jadwal</h2>
+
+        <label>Jumlah per kelompok</label>
         <input
           type="number"
           value={jumlah}
           onChange={(e) => setJumlah(+e.target.value)}
+          style={input}
         />
 
-        <Calendar onClickDay={toggle} />
+        <Calendar
+          onClickDay={toggleDate}
+          tileClassName={({ date }) =>
+            selectedDates.includes(formatDate(date)) ? "active" : ""
+          }
+        />
 
-        <button onClick={generate}>Generate</button>
+        <p>{selectedDates.length}/10 hari dipilih</p>
+
+        {selectedDates.map((d) => (
+          <div key={d} style={dateRow}>
+            {d}
+            <button onClick={() => removeDate(d)}>✖</button>
+          </div>
+        ))}
+
+        <button onClick={clearAll}>Hapus Semua</button>
+
+        <button style={btn} onClick={generate}>
+          Generate
+        </button>
       </div>
+
+      <style jsx global>{`
+        .active {
+          background: #2563eb !important;
+          color: white !important;
+          border-radius: 8px;
+        }
+      `}</style>
     </div>
   );
 }
 
+/* STYLE */
+
 const wrap = {
   minHeight: "100vh",
+  background: "#0f172a",
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
+  padding: 20,
 };
 
 const card = {
   background: "white",
-  borderRadius: 16,
-  padding: "16px",
-  boxShadow: "0 20px 40px rgba(0,0,0,0.25)",
-  maxWidth: 1100,
-  margin: "auto",
+  padding: 20,
+  borderRadius: 14,
+  width: "100%",
+  maxWidth: 400,
 };
 
+const input = {
+  width: "100%",
+  padding: 8,
+  marginBottom: 10,
+};
 
+const dateRow = {
+  display: "flex",
+  justifyContent: "space-between",
+  marginTop: 6,
+};
+
+const btn = {
+  width: "100%",
+  padding: 10,
+  background: "#2563eb",
+  color: "white",
+  border: "none",
+  borderRadius: 8,
+  marginTop: 10,
+};
