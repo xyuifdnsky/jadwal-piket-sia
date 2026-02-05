@@ -1,28 +1,90 @@
+import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../lib/firebase";
-import { useState } from "react";
+import { useRouter } from "next/router";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
 
-  const login = async () => {
-    try {
-      const res = await signInWithEmailAndPassword(auth, email, password);
-      console.log("LOGIN OK:", res.user.uid);
-      alert("LOGIN BERHASIL");
-    } catch (err) {
-      console.error("LOGIN ERROR FULL:", err);
-      alert(err.code + " | " + err.message);
-    }
-  };
+const router = useRouter();
 
-  return (
-    <div>
-      <input onChange={e => setEmail(e.target.value)} />
-      <input type="password" onChange={e => setPassword(e.target.value)} />
-      <button onClick={login}>LOGIN</button>
-    </div>
-  );
+const [email,setEmail]=useState("");
+const [password,setPassword]=useState("");
+
+const login = async ()=>{
+
+try{
+
+await signInWithEmailAndPassword(auth,email,password);
+
+router.push("/generate_jadwal");
+
+}catch(err){
+
+alert(err.message);
+
 }
 
+}
+
+return(
+
+<div style={wrap}>
+
+<div style={card}>
+
+<h2>🔐 Admin Login</h2>
+
+<input
+placeholder="Email"
+value={email}
+onChange={e=>setEmail(e.target.value)}
+style={input}
+/>
+
+<input
+type="password"
+placeholder="Password"
+value={password}
+onChange={e=>setPassword(e.target.value)}
+style={input}
+/>
+
+<button onClick={login} style={btn}>
+Login
+</button>
+
+</div>
+</div>
+
+)
+}
+
+const wrap={
+minHeight:"100vh",
+display:"flex",
+justifyContent:"center",
+alignItems:"center",
+background:"#0f172a"
+}
+
+const card={
+background:"white",
+padding:30,
+borderRadius:12,
+width:300
+}
+
+const input={
+width:"100%",
+padding:10,
+marginBottom:15
+}
+
+const btn={
+width:"100%",
+padding:10,
+background:"#2563eb",
+color:"white",
+border:"none",
+borderRadius:6
+}
