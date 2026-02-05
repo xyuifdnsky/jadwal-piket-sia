@@ -16,6 +16,7 @@ export default function Navbar() {
         <Link href="/" style={linkStyle}>Daftar Mahasiswa</Link>
         <Link href="/lihat_jadwal" style={linkStyle}>Jadwal Piket</Link>
         {/* <Link href="/admin/GenerateJadwal" style={linkStyle}>Generate Jadwal</Link> */}
+        {<Link href="/login" style={linkStyle}>Admin Login</Link>}
       </div>
     </nav>
   );
