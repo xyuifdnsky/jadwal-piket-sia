@@ -15,7 +15,7 @@ export default function Navbar() {
       <div style={{ display: "flex", gap: 20 }}>
         <Link href="/" style={linkStyle}>Daftar Mahasiswa</Link>
         <Link href="/lihat_jadwal" style={linkStyle}>Jadwal Piket</Link>
-        <Link href="/admin/GenerateJadwal" style={linkStyle}>Generate Jadwal</Link>
+        {/* <Link href="/admin/GenerateJadwal" style={linkStyle}>Generate Jadwal</Link> */}
       </div>
     </nav>
   );
