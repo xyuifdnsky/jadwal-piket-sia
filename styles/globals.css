@@ -1,0 +1,43 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: #f1f5f9;
+}
+
+.card {
+  background: white;
+  padding: 16px;
+  border-radius: 10px;
+  margin-top: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.belum {
+  border-left: 6px solid #ef4444;
+  background: #fee2e2;
+  color: #7f1d1d;
+}
+
+.sudah {
+  border-left: 6px solid #22c55e;
+  background: #dcfce7;
+  color: #14532d;
+}
+
+button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  background: #2563eb;
+  color: white;
+}
+
+*:not(input):not(textarea) {
+  caret-color: transparent;
+}
+
