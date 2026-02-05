@@ -16,7 +16,7 @@ try{
 
 await signInWithEmailAndPassword(auth,email,password);
 
-router.push("/generate_jadwal");
+router.push("/admin/GenerateJadwal");
 
 }catch(err){
 
