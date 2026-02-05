@@ -8,7 +8,6 @@ const Calendar = dynamic(() => import("react-calendar"), {
   ssr: false,
 });
 
-
 import { db, auth } from "../../lib/firebase";
 import {
   collection,
@@ -18,6 +17,7 @@ import {
   getDoc,
   deleteDoc,
 } from "firebase/firestore";
+
 import { onAuthStateChanged } from "firebase/auth";
 
 export default function GenerateJadwal() {

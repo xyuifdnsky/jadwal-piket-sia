@@ -2,6 +2,8 @@ import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../lib/firebase";
 import { useRouter } from "next/router";
+import { wrap } from "framer-motion";
+
 
 export default function Login() {
 
@@ -27,7 +29,8 @@ alert(err.message);
 
 return(
 
-<div style={wrap}>
+<div style={wrapStyle}>
+
 
 <div style={card}>
 
@@ -58,7 +61,8 @@ Login
 )
 }
 
-const wrap={
+const wrapStyle = {
+
 minHeight:"100vh",
 display:"flex",
 justifyContent:"center",

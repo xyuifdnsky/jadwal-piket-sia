@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { db } from "../lib/firebase";
 import { collection, onSnapshot, doc, updateDoc } from "firebase/firestore";
+import { wrap } from "framer-motion";
+
 
 export default function LihatJadwal() {
   const router = useRouter();
@@ -30,7 +32,8 @@ export default function LihatJadwal() {
   };
 
   return (
-    <div style={wrap}>
+   <div style={wrapStyle}>
+
       {/* ===== NAVBAR ===== */}
       <div style={navbar}>
         <button style={backBtn} onClick={() => router.push("/")}>
@@ -106,7 +109,8 @@ const formatTanggal = (tgl) =>
 
 /* ===== STYLE (RESPONSIVE) ===== */
 
-const wrap = {
+const wrapStyle = {
+
   minHeight: "100vh",
   padding: "16px",
   background: "linear-gradient(135deg,#0f172a,#1e293b)",
