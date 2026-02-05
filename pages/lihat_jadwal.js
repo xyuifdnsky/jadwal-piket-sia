@@ -29,7 +29,8 @@ export default function LihatJadwal() {
   };
 
   return (
-    <div style={wrap}>
+<div style={wrapStyle}>
+
       <div style={navbar}>
         <button style={backBtn} onClick={() => router.push("/")}>
           ⬅ Kembali
@@ -102,10 +103,11 @@ const backBtn = {
 
 const card = {
   background: "white",
-  padding: 20,
-  borderRadius: 12,
+  borderRadius: 16,
+  padding: "16px",
+  boxShadow: "0 20px 40px rgba(0,0,0,0.25)",
   maxWidth: 1100,
-  margin: "20px auto",
+  margin: "auto",
 };
 
 const title = {

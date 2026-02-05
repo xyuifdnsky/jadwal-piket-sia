@@ -18,7 +18,8 @@ export default function Login() {
   };
 
   return (
-    <div style={wrap}>
+  <div style={wrapStyle}>
+
       <div style={card}>
         <h2>LOGIN ADMIN</h2>
 
@@ -51,10 +52,13 @@ const wrap = {
 
 const card = {
   background: "white",
-  padding: 30,
-  borderRadius: 12,
-  width: 300,
+  borderRadius: 16,
+  padding: "16px",
+  boxShadow: "0 20px 40px rgba(0,0,0,0.25)",
+  maxWidth: 1100,
+  margin: "auto",
 };
+
 
 const input = {
   width: "100%",
