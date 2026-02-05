@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import Calendar from "react-calendar";
-import "react-calendar/dist/Calendar.css";
+import dynamic from "next/dynamic";
+import { wrap } from "framer-motion";
+
+
+const Calendar = dynamic(() => import("react-calendar"), {
+  ssr: false,
+});
+
 
 import { db, auth } from "../../lib/firebase";
 import {
@@ -166,3 +172,12 @@ export default function GenerateJadwal() {
     </div>
   );
 }
+
+<style jsx global>{`
+@import url('https://unpkg.com/react-calendar/dist/Calendar.css');
+.masuk {
+  background:#2563eb!important;
+  color:white!important;
+  border-radius:8px;
+}
+`}</style>
